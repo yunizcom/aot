@@ -31,9 +31,13 @@ public class MainActivity extends Activity {
 	public int screenHeight = 0;
 	
 	private RelativeLayout gameMenu;
+	private RelativeLayout gameStage1;
+	
 	private ImageView logo;
 	private ImageView playBtn;
 	private ImageView quitBtn;
+	
+	private ImageView human;
 	
 	MediaPlayer bgMusic;
 	MediaPlayer clickEffect;
@@ -76,9 +80,13 @@ public class MainActivity extends Activity {
 		double setNewWidth = screenWidth;
 		
 		gameMenu = (RelativeLayout) findViewById(R.id.gameMenu);
+		gameStage1 = (RelativeLayout) findViewById(R.id.gameStage1);
+		
 		logo = (ImageView) findViewById(R.id.logo);
 		playBtn = (ImageView) findViewById(R.id.playBtn);
 		quitBtn = (ImageView) findViewById(R.id.quitBtn);
+		
+		human = (ImageView) findViewById(R.id.human);
 		
 		bgMusic  = new MediaPlayer();
 		clickEffect  = new MediaPlayer();
@@ -87,11 +95,16 @@ public class MainActivity extends Activity {
 		{
 		    InputStream ims = getAssets().open("menu_bg.jpg");
 		    Drawable d = Drawable.createFromStream(ims, null);
+		    
+		    InputStream ims2 = getAssets().open("stage_1.jpg");
+		    Drawable d2 = Drawable.createFromStream(ims2, null);
 
 		    if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
 		    	gameMenu.setBackgroundDrawable(d);
+		    	gameStage1.setBackgroundDrawable(d2);
 		    } else {
 		    	gameMenu.setBackground(d);
+		    	gameStage1.setBackground(d2);
 		    }
 		    
 		    InputStream ims1 = getAssets().open("logo.png");
@@ -105,6 +118,10 @@ public class MainActivity extends Activity {
 		    ims1 = getAssets().open("quitBtn.png");
 		    d1 = Drawable.createFromStream(ims1, null);
 		    quitBtn.setImageDrawable(d1);
+		    
+		    ims1 = getAssets().open("human_1.png");
+		    d1 = Drawable.createFromStream(ims1, null);
+		    human.setImageDrawable(d1);
 		}
 		catch(IOException ex) 
 		{
@@ -112,29 +129,42 @@ public class MainActivity extends Activity {
 		}
 		
 		//----------auto Adjust UI Elements size----------
-		setNewWidth = screenWidth * 0.8;
-		setNewHeight = screenHeight * 0.5;
+		if(smallScreen == true){
+			
+		}
+		
+		setNewWidth = screenWidth * 0.7;
+		setNewHeight = screenHeight * 0.4;
 		logo.setMinimumHeight((int)setNewHeight);
 		logo.setMaxHeight((int)setNewHeight);
 		logo.setMinimumWidth((int)setNewWidth);
 		logo.setMaxWidth((int)setNewWidth);
-		logo.setAdjustViewBounds(true);
-		logo.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		
-		setNewWidth = screenWidth * 0.4;
+		setNewWidth = screenWidth * 0.35;
 		setNewHeight = screenHeight * 0.2;
 		playBtn.setMinimumHeight((int)setNewHeight);
 		playBtn.setMaxHeight((int)setNewHeight);
 		playBtn.setMinimumWidth((int)setNewWidth);
 		playBtn.setMaxWidth((int)setNewWidth);
-		playBtn.setAdjustViewBounds(true);
-		playBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		
 		quitBtn.setMinimumHeight((int)setNewHeight);
 		quitBtn.setMaxHeight((int)setNewHeight);
 		quitBtn.setMinimumWidth((int)setNewWidth);
 		quitBtn.setMaxWidth((int)setNewWidth);
+		
+		setNewWidth = screenWidth * 0.5;
+		setNewHeight = screenHeight * 0.4;
+		human.setMinimumHeight((int)setNewHeight);
+		human.setMaxHeight((int)setNewHeight);
+		human.setMinimumWidth((int)setNewWidth);
+		human.setMaxWidth((int)setNewWidth);
+		
+		//logo.setAdjustViewBounds(true);
+		playBtn.setAdjustViewBounds(true);
 		quitBtn.setAdjustViewBounds(true);
+		
+		//logo.setScaleType( ImageView.ScaleType.FIT_CENTER);
+		playBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		quitBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		//----------auto Adjust UI Elements size----------
 		
@@ -143,7 +173,7 @@ public class MainActivity extends Activity {
 		    @Override
 		    public void onOrientationChanged(int arg0) {
 		     // TODO Auto-generated method stub
-		    	
+		    	moveHuman(arg0);
 		    }
 		};
 		    
@@ -156,8 +186,17 @@ public class MainActivity extends Activity {
 	    playBGMusic("music_1.mp3");
 	}
 	
+	public void moveHuman(int arg0){
+		
+	}
+	
 	public void playBtn(View v) {
 		buttonClicks();
+		
+		gameMenu.setVisibility(View.INVISIBLE);
+		gameStage1.setVisibility(View.VISIBLE);
+		
+		playBGMusic("music_1.mp3");
 	}
 	
 	public void quitBtn(View v) {
@@ -257,6 +296,9 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		bgMusic.setVolume(0.4f,0.4f);
+		
 		bgMusic.setLooping(true);
 		bgMusic.start();
 	}
