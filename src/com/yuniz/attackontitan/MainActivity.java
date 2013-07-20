@@ -2,6 +2,7 @@ package com.yuniz.attackontitan;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 
 import com.yuniz.attackontitan.R;
 
@@ -22,7 +23,10 @@ import android.view.Menu;
 import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 public class MainActivity extends Activity {
@@ -30,14 +34,21 @@ public class MainActivity extends Activity {
 	public int screenWidth = 0;
 	public int screenHeight = 0;
 	
+	private int previousX = 0;
+	
 	private RelativeLayout gameMenu;
 	private RelativeLayout gameStage1;
+	private RelativeLayout gameStage_human;
 	
 	private ImageView logo;
 	private ImageView playBtn;
 	private ImageView quitBtn;
 	
 	private ImageView human;
+	
+	private ImageView titan1;
+	private ImageView titan2;
+	private ImageView titan3;
 	
 	MediaPlayer bgMusic;
 	MediaPlayer clickEffect;
@@ -81,12 +92,17 @@ public class MainActivity extends Activity {
 		
 		gameMenu = (RelativeLayout) findViewById(R.id.gameMenu);
 		gameStage1 = (RelativeLayout) findViewById(R.id.gameStage1);
+		gameStage_human = (RelativeLayout) findViewById(R.id.gameStage_human);
 		
 		logo = (ImageView) findViewById(R.id.logo);
 		playBtn = (ImageView) findViewById(R.id.playBtn);
 		quitBtn = (ImageView) findViewById(R.id.quitBtn);
 		
 		human = (ImageView) findViewById(R.id.human);
+		
+		titan1 = (ImageView) findViewById(R.id.titan1);
+		titan2 = (ImageView) findViewById(R.id.titan2);
+		titan3 = (ImageView) findViewById(R.id.titan3);
 		
 		bgMusic  = new MediaPlayer();
 		clickEffect  = new MediaPlayer();
@@ -118,6 +134,18 @@ public class MainActivity extends Activity {
 		    ims1 = getAssets().open("quitBtn.png");
 		    d1 = Drawable.createFromStream(ims1, null);
 		    quitBtn.setImageDrawable(d1);
+		    
+		    ims1 = getAssets().open("g" + generateNumber(1,4) + "_" + generateNumber(1,2) + ".png");
+		    d1 = Drawable.createFromStream(ims1, null);
+		    titan1.setImageDrawable(d1);
+		    
+		    ims1 = getAssets().open("g" + generateNumber(1,4) + "_" + generateNumber(1,2) + ".png");
+		    d1 = Drawable.createFromStream(ims1, null);
+		    titan2.setImageDrawable(d1);
+		    
+		    ims1 = getAssets().open("g" + generateNumber(1,4) + "_" + generateNumber(1,2) + ".png");
+		    d1 = Drawable.createFromStream(ims1, null);
+		    titan3.setImageDrawable(d1);
 		    
 		    ims1 = getAssets().open("human_1.png");
 		    d1 = Drawable.createFromStream(ims1, null);
@@ -159,13 +187,39 @@ public class MainActivity extends Activity {
 		human.setMinimumWidth((int)setNewWidth);
 		human.setMaxWidth((int)setNewWidth);
 		
+		setNewWidth = screenWidth * 0.1;
+		setNewHeight = screenHeight * 0.2;
+		titan1.setMinimumHeight((int)setNewHeight);
+		titan1.setMaxHeight((int)setNewHeight);
+		titan1.setMinimumWidth((int)setNewWidth);
+		titan1.setMaxWidth((int)setNewWidth);
+		
+		titan2.setMinimumHeight((int)setNewHeight);
+		titan2.setMaxHeight((int)setNewHeight);
+		titan2.setMinimumWidth((int)setNewWidth);
+		titan2.setMaxWidth((int)setNewWidth);
+		
+		titan3.setMinimumHeight((int)setNewHeight);
+		titan3.setMaxHeight((int)setNewHeight);
+		titan3.setMinimumWidth((int)setNewWidth);
+		titan3.setMaxWidth((int)setNewWidth);
+		
 		//logo.setAdjustViewBounds(true);
 		playBtn.setAdjustViewBounds(true);
 		quitBtn.setAdjustViewBounds(true);
+		titan1.setAdjustViewBounds(true);
+		titan2.setAdjustViewBounds(true);
+		titan3.setAdjustViewBounds(true);
 		
 		//logo.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		playBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		quitBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
+		
+		human.setScaleType( ImageView.ScaleType.FIT_CENTER);
+		
+		titan1.setScaleType( ImageView.ScaleType.FIT_CENTER);
+		titan2.setScaleType( ImageView.ScaleType.FIT_CENTER);
+		titan3.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		//----------auto Adjust UI Elements size----------
 		
 		myOrientationEventListener = new OrientationEventListener(this, SensorManager.SENSOR_DELAY_NORMAL){
@@ -186,8 +240,57 @@ public class MainActivity extends Activity {
 	    playBGMusic("music_1.mp3");
 	}
 	
-	public void moveHuman(int arg0){
+	public int generateNumber(int startFrom, int stopAt){
+		Random r = new Random();
+		int i1=r.nextInt(stopAt-startFrom) + startFrom;
+		return i1;
+	}
+	
+	public void initTitans(ImageView titanSelect, int locations){
+		int arg0 = (screenWidth / 100) * locations;
 		
+		arg0 = arg0 - ( titanSelect.getWidth() / 2 );
+		
+		Animation animation = new TranslateAnimation(arg0, arg0,0, 0);
+		animation.setDuration(0);
+		animation.setFillAfter(true);
+		titanSelect.startAnimation(animation);
+	}
+	
+	public void moveHuman(int arg0){
+		if(arg0 < 240){arg0 = 240;}
+		if(arg0 > 300){arg0 = 300;}
+		
+		arg0-=240;
+		arg0 = arg0 * 100 / 60;
+		
+		String humanGIF = "human_1.png";
+		if(arg0 >=50){
+			humanGIF = "human_2.png";
+		}
+		
+		try 
+		{
+		    InputStream ims1 = getAssets().open(humanGIF);
+		    Drawable d1 = Drawable.createFromStream(ims1, null);
+
+		    human.setImageDrawable(d1);
+		}
+		catch(IOException ex) 
+		{
+		    return;
+		}
+		
+		arg0 = (screenWidth / 100) * arg0;
+		
+		arg0 = arg0 - ( human.getWidth() / 2 );
+		
+		previousX = arg0;
+		
+		Animation animation = new TranslateAnimation(previousX, arg0,0, 0);
+		animation.setDuration(500);
+		animation.setFillAfter(true);
+		human.startAnimation(animation);
 	}
 	
 	public void playBtn(View v) {
@@ -195,6 +298,11 @@ public class MainActivity extends Activity {
 		
 		gameMenu.setVisibility(View.INVISIBLE);
 		gameStage1.setVisibility(View.VISIBLE);
+		gameStage_human.setVisibility(View.VISIBLE);
+		
+		initTitans(titan1,30);
+		initTitans(titan2,60);
+		initTitans(titan3,90);
 		
 		playBGMusic("music_1.mp3");
 	}
