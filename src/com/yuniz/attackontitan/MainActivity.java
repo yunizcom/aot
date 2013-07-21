@@ -26,15 +26,34 @@ import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	
 	public int screenWidth = 0;
 	public int screenHeight = 0;
+	
+	public int scaleSize1 = 1;
+	public int scaleSize2 = 1;
+	public int scaleSize3 = 1;
+	
+	public int titanLocNow1 = 30;
+	public int titanLocNow2 = 60;
+	public int titanLocNow3 = 90;
+	
+	public int enemyTurn = 1;
+	
+	public int moveNowNumber = 0;
+	
+	public int humanPosition = 1;
+	
+	public int totalHits = 0;
 	
 	private int previousX = 0;
 	
@@ -51,6 +70,8 @@ public class MainActivity extends Activity {
 	private ImageView titan1;
 	private ImageView titan2;
 	private ImageView titan3;
+	
+	private TextView gameScore;
 	
 	MediaPlayer bgMusic;
 	MediaPlayer clickEffect;
@@ -107,6 +128,8 @@ public class MainActivity extends Activity {
 		titan1 = (ImageView) findViewById(R.id.titan1);
 		titan2 = (ImageView) findViewById(R.id.titan2);
 		titan3 = (ImageView) findViewById(R.id.titan3);
+		
+		gameScore = (TextView) findViewById(R.id.gameScore);
 		
 		bgMusic  = new MediaPlayer();
 		clickEffect  = new MediaPlayer();
@@ -242,6 +265,10 @@ public class MainActivity extends Activity {
 	    	//finish();
 	    }
 	    
+	    initTitans(titan1,titanLocNow1);
+		initTitans(titan2,titanLocNow2);
+		initTitans(titan3,titanLocNow3);
+	    
 	    playBGMusic("music_1.mp3");
 	}
 	
@@ -256,10 +283,19 @@ public class MainActivity extends Activity {
 		
 		arg0 = arg0 - ( titanSelect.getWidth() / 2 );
 		
-		Animation animation = new TranslateAnimation(arg0, arg0,0, 0);
-		animation.setDuration(0);
-		animation.setFillAfter(true);
-		titanSelect.startAnimation(animation);
+		int curScaleSize = -1;
+		
+		Animation animationScale = new ScaleAnimation(curScaleSize, ( curScaleSize + 1 ), curScaleSize, ( curScaleSize + 1 ), Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.9f);
+    	Animation animationLoc = new TranslateAnimation(arg0, arg0,0, 0);
+    	animationScale.setDuration(0);
+    	animationLoc.setDuration(0);
+
+		AnimationSet animSet = new AnimationSet(true);
+		animSet.setFillAfter(true);
+		animSet.addAnimation(animationScale);
+		animSet.addAnimation(animationLoc);
+		
+		titanSelect.startAnimation(animSet);
 	}
 	
 	public void moveHuman(int arg0){
@@ -283,6 +319,14 @@ public class MainActivity extends Activity {
 		String humanGIF = "human_1.png";
 		if(arg0 >=50){
 			humanGIF = "human_2.png";
+		}
+		
+		if(arg0 <= 33){
+			humanPosition = 1;
+		}else if(arg0 >= 64){
+			humanPosition = 3;
+		}else{
+			humanPosition = 2;
 		}
 		
 		try 
@@ -314,36 +358,110 @@ public class MainActivity extends Activity {
 
 		    @Override
 		    public void run() {
-		    	enemyMoving(titan1);
-		    	enemyMoving(titan2);
-		    	enemyMoving(titan3);
+		    	
+		    	/*if(enemyTurn == 1){
+		    		enemyMoving(enemyTurn);
+		    		enemyTurn++;
+		    	}else if(enemyTurn == 2){
+		    		enemyMoving(enemyTurn);
+		    		enemyTurn++;
+		    	}else if(enemyTurn == 3){
+		    		enemyMoving(enemyTurn);
+		    		enemyTurn = 1;
+		    	}*/
+		    	enemyMoving(enemyTurn);
+		    	
 		    }
 		         
-		},0,1000);
+		},0,500);
 	}
 	
-	public void enemyMoving(ImageView object){
-		int increaseSize = 10;
-		int curHeight = 0;
-		int curWidth = 0;
-	
-		curHeight = object.getHeight() + ( (object.getHeight() / 100) * increaseSize );
-		curWidth = object.getWidth() + ( (object.getWidth() / 100) * increaseSize );
-
-		object.getLayoutParams().height = curHeight;
-		object.getLayoutParams().width = curWidth;
-
-		 /*runOnUiThread(new Runnable() {
-		    public void run() {
-		    	titan3 = (ImageView) findViewById(R.id.titan3);
-		    	titan3.setMaxHeight(1000);
-		    	titan3.setMinimumHeight(1000);
-		    	titan3.setMaxWidth(1000);
-		    	titan3.setMinimumWidth(1000);
-		    }
-		});*/
+	public void enemyMoving(int objectNumber){
 		
+		moveNowNumber = objectNumber;
+		
+		 runOnUiThread(new Runnable() {
+		    public void run() {
+		    	
+		    	int curScaleSize = 0;
+		    	ImageView curObject = null;
+		    	int objectLoc = 30;
+		    	
+		    	if(moveNowNumber == 1){
+		    		curScaleSize = scaleSize1;
+		    		curObject = titan1;
+		    		objectLoc = 30;
+		    	}else if(moveNowNumber == 2){
+		    		curScaleSize = scaleSize2;
+		    		curObject = titan2;
+		    		objectLoc = 60;
+		    	}else if(moveNowNumber == 3){
+		    		curScaleSize = scaleSize3;
+		    		curObject = titan3;
+		    		objectLoc = 90;
+		    	}else{
+		    		return;
+		    	}
+		    	
+		    	int arg0 = (screenWidth / 100) * objectLoc;
+				arg0 = arg0 - ( curObject.getWidth() / 2 );
+		    	
+				curScaleSize++;
+				if(curScaleSize > 7){
+					
+					hitTest(enemyTurn);
+					
+					curScaleSize = -1;
+					enemyTurn = generateNumber(1,4);
+					
+					try {
+						InputStream ims1 = getAssets().open("g" + generateNumber(1,4) + "_" + generateNumber(1,2) + ".png");
+						Drawable d1 = Drawable.createFromStream(ims1, null);
+						curObject.setImageDrawable(d1);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+				
+		    	Animation animationScale = new ScaleAnimation(curScaleSize, ( curScaleSize + 1 ), curScaleSize, ( curScaleSize + 1 ), Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.9f);
+		    	Animation animationLoc = new TranslateAnimation(arg0, arg0,0, 0);
+		    	animationScale.setDuration(0);
+		    	animationLoc.setDuration(0);
+
+				AnimationSet animSet = new AnimationSet(true);
+				animSet.setFillAfter(true);
+				animSet.addAnimation(animationScale);
+				animSet.addAnimation(animationLoc);
+				
+				curObject.startAnimation(animSet);
+				
+				if(moveNowNumber == 1){
+					scaleSize1 = curScaleSize;
+		    	}else if(moveNowNumber == 2){
+		    		scaleSize2 = curScaleSize;
+		    	}else if(moveNowNumber == 3){
+		    		scaleSize3 = curScaleSize;
+		    	}
+				
+		    }
+		});
+	}
 	
+	public void hitTest(int titanLoc){
+		if(titanLoc == humanPosition){
+			
+		}else{
+			buttonClicks();
+			totalHits++;
+			gameScore.setText("SCORE : " + totalHits + " Titans");
+		}
+	}
+	
+	public void gameOver(){
+		t.cancel();
+		
 	}
 	
 	public void playBtn(View v) {
@@ -352,12 +470,7 @@ public class MainActivity extends Activity {
 		gameMenu.setVisibility(View.INVISIBLE);
 		gameStage_human.setVisibility(View.VISIBLE);
 		gameStage1.setVisibility(View.VISIBLE);
-		
-		
-		initTitans(titan1,30);
-		initTitans(titan2,60);
-		initTitans(titan3,90);
-		
+
 		enemyMovingTimer();
 		
 		playBGMusic("music_1.mp3");
