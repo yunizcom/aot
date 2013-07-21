@@ -3,6 +3,8 @@ package com.yuniz.attackontitan;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.yuniz.attackontitan.R;
 
@@ -52,6 +54,8 @@ public class MainActivity extends Activity {
 	
 	MediaPlayer bgMusic;
 	MediaPlayer clickEffect;
+	
+	Timer t = new Timer();
 	
 	private OrientationEventListener myOrientationEventListener;
 	
@@ -142,7 +146,7 @@ public class MainActivity extends Activity {
 		    ims1 = getAssets().open("g" + generateNumber(1,4) + "_" + generateNumber(1,2) + ".png");
 		    d1 = Drawable.createFromStream(ims1, null);
 		    titan2.setImageDrawable(d1);
-		    
+    
 		    ims1 = getAssets().open("g" + generateNumber(1,4) + "_" + generateNumber(1,2) + ".png");
 		    d1 = Drawable.createFromStream(ims1, null);
 		    titan3.setImageDrawable(d1);
@@ -158,7 +162,7 @@ public class MainActivity extends Activity {
 		
 		//----------auto Adjust UI Elements size----------
 		if(smallScreen == true){
-			
+			human.setAdjustViewBounds(true);
 		}
 		
 		setNewWidth = screenWidth * 0.7;
@@ -207,6 +211,7 @@ public class MainActivity extends Activity {
 		//logo.setAdjustViewBounds(true);
 		playBtn.setAdjustViewBounds(true);
 		quitBtn.setAdjustViewBounds(true);
+		
 		titan1.setAdjustViewBounds(true);
 		titan2.setAdjustViewBounds(true);
 		titan3.setAdjustViewBounds(true);
@@ -258,6 +263,17 @@ public class MainActivity extends Activity {
 	}
 	
 	public void moveHuman(int arg0){
+		int diffMove = 0;
+		if(previousX > arg0){
+			diffMove = previousX - arg0;
+		}else{
+			diffMove = arg0 - previousX;
+		}
+		
+		if(diffMove < 6){
+			return;
+		}
+		
 		if(arg0 < 240){arg0 = 240;}
 		if(arg0 > 300){arg0 = 300;}
 		
@@ -293,16 +309,56 @@ public class MainActivity extends Activity {
 		human.startAnimation(animation);
 	}
 	
+	public void enemyMovingTimer(){
+		t.scheduleAtFixedRate(new TimerTask() {
+
+		    @Override
+		    public void run() {
+		    	enemyMoving(titan1);
+		    	enemyMoving(titan2);
+		    	enemyMoving(titan3);
+		    }
+		         
+		},0,1000);
+	}
+	
+	public void enemyMoving(ImageView object){
+		int increaseSize = 10;
+		int curHeight = 0;
+		int curWidth = 0;
+	
+		curHeight = object.getHeight() + ( (object.getHeight() / 100) * increaseSize );
+		curWidth = object.getWidth() + ( (object.getWidth() / 100) * increaseSize );
+
+		object.getLayoutParams().height = curHeight;
+		object.getLayoutParams().width = curWidth;
+
+		 /*runOnUiThread(new Runnable() {
+		    public void run() {
+		    	titan3 = (ImageView) findViewById(R.id.titan3);
+		    	titan3.setMaxHeight(1000);
+		    	titan3.setMinimumHeight(1000);
+		    	titan3.setMaxWidth(1000);
+		    	titan3.setMinimumWidth(1000);
+		    }
+		});*/
+		
+	
+	}
+	
 	public void playBtn(View v) {
 		buttonClicks();
 		
 		gameMenu.setVisibility(View.INVISIBLE);
-		gameStage1.setVisibility(View.VISIBLE);
 		gameStage_human.setVisibility(View.VISIBLE);
+		gameStage1.setVisibility(View.VISIBLE);
+		
 		
 		initTitans(titan1,30);
 		initTitans(titan2,60);
 		initTitans(titan3,90);
+		
+		enemyMovingTimer();
 		
 		playBGMusic("music_1.mp3");
 	}
@@ -422,6 +478,8 @@ public class MainActivity extends Activity {
 	 // TODO Auto-generated method stub
 	 super.onDestroy();
 	 
+	 t.cancel();
+	 
 	 bgMusic.stop();
 	 bgMusic.release();
 	 
@@ -438,7 +496,6 @@ public class MainActivity extends Activity {
 		if(bgMusic.isPlaying()){
 			bgMusic.pause();
 		}
-		
 	}
 	
 	protected void onResume() {
