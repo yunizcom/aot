@@ -74,6 +74,62 @@
     </RelativeLayout>
     
     <RelativeLayout
+        android:id="@+id/gameIntro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible"
+        android:layout_alignParentTop="true" >
+
+        <ImageView
+            android:id="@+id/startBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="1dp"
+            android:layout_marginBottom="1dp"
+            android:onClick="startBtn"
+            android:src="@drawable/ic_launcher" />
+
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/gameOver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible"
+        android:layout_alignParentTop="true" >
+
+        <ImageView
+            android:id="@+id/rePlayBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:onClick="rePlayBtn"
+            android:src="@drawable/ic_launcher" />
+        
+        <TextView
+        android:id="@+id/resultTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/rePlayBtn"
+        android:text=""
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#e10f0f"
+        android:textSize="30dp" />
+
+    </RelativeLayout>
+    
+    <RelativeLayout
         android:id="@+id/gameMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

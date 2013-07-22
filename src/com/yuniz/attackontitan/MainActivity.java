@@ -60,10 +60,14 @@ public class MainActivity extends Activity {
 	private RelativeLayout gameMenu;
 	private RelativeLayout gameStage1;
 	private RelativeLayout gameStage_human;
+	private RelativeLayout gameIntro;
+	private RelativeLayout gameOver;
 	
 	private ImageView logo;
 	private ImageView playBtn;
 	private ImageView quitBtn;
+	private ImageView startBtn;
+	private ImageView rePlayBtn;
 	
 	private ImageView human;
 	
@@ -72,6 +76,7 @@ public class MainActivity extends Activity {
 	private ImageView titan3;
 	
 	private TextView gameScore;
+	private TextView resultTxt;
 	
 	MediaPlayer bgMusic;
 	MediaPlayer clickEffect;
@@ -118,10 +123,14 @@ public class MainActivity extends Activity {
 		gameMenu = (RelativeLayout) findViewById(R.id.gameMenu);
 		gameStage1 = (RelativeLayout) findViewById(R.id.gameStage1);
 		gameStage_human = (RelativeLayout) findViewById(R.id.gameStage_human);
+		gameIntro = (RelativeLayout) findViewById(R.id.gameIntro);
+		gameOver = (RelativeLayout) findViewById(R.id.gameOver);
 		
 		logo = (ImageView) findViewById(R.id.logo);
 		playBtn = (ImageView) findViewById(R.id.playBtn);
 		quitBtn = (ImageView) findViewById(R.id.quitBtn);
+		startBtn = (ImageView) findViewById(R.id.startBtn);
+		rePlayBtn = (ImageView) findViewById(R.id.rePlayBtn);
 		
 		human = (ImageView) findViewById(R.id.human);
 		
@@ -130,6 +139,7 @@ public class MainActivity extends Activity {
 		titan3 = (ImageView) findViewById(R.id.titan3);
 		
 		gameScore = (TextView) findViewById(R.id.gameScore);
+		resultTxt = (TextView) findViewById(R.id.resultTxt);
 		
 		bgMusic  = new MediaPlayer();
 		clickEffect  = new MediaPlayer();
@@ -141,13 +151,23 @@ public class MainActivity extends Activity {
 		    
 		    InputStream ims2 = getAssets().open("stage_1.jpg");
 		    Drawable d2 = Drawable.createFromStream(ims2, null);
+		    
+		    InputStream ims3 = getAssets().open("infors.jpg");
+		    Drawable d3 = Drawable.createFromStream(ims3, null);
+		    
+		    InputStream ims4 = getAssets().open("gameover.jpg");
+		    Drawable d4 = Drawable.createFromStream(ims4, null);
 
 		    if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
 		    	gameMenu.setBackgroundDrawable(d);
 		    	gameStage1.setBackgroundDrawable(d2);
+		    	gameIntro.setBackgroundDrawable(d3);
+		    	gameOver.setBackgroundDrawable(d4);
 		    } else {
 		    	gameMenu.setBackground(d);
 		    	gameStage1.setBackground(d2);
+		    	gameIntro.setBackground(d3);
+		    	gameOver.setBackground(d4);
 		    }
 		    
 		    InputStream ims1 = getAssets().open("logo.png");
@@ -161,6 +181,14 @@ public class MainActivity extends Activity {
 		    ims1 = getAssets().open("quitBtn.png");
 		    d1 = Drawable.createFromStream(ims1, null);
 		    quitBtn.setImageDrawable(d1);
+		    
+		    ims1 = getAssets().open("startBtn.png");
+		    d1 = Drawable.createFromStream(ims1, null);
+		    startBtn.setImageDrawable(d1);
+		    
+		    ims1 = getAssets().open("replayBtn.png");
+		    d1 = Drawable.createFromStream(ims1, null);
+		    rePlayBtn.setImageDrawable(d1);
 		    
 		    ims1 = getAssets().open("g" + generateNumber(1,4) + "_" + generateNumber(1,2) + ".png");
 		    d1 = Drawable.createFromStream(ims1, null);
@@ -207,6 +235,16 @@ public class MainActivity extends Activity {
 		quitBtn.setMinimumWidth((int)setNewWidth);
 		quitBtn.setMaxWidth((int)setNewWidth);
 		
+		startBtn.setMinimumHeight((int)setNewHeight);
+		startBtn.setMaxHeight((int)setNewHeight);
+		startBtn.setMinimumWidth((int)setNewWidth);
+		startBtn.setMaxWidth((int)setNewWidth);
+		
+		rePlayBtn.setMinimumHeight((int)setNewHeight);
+		rePlayBtn.setMaxHeight((int)setNewHeight);
+		rePlayBtn.setMinimumWidth((int)setNewWidth);
+		rePlayBtn.setMaxWidth((int)setNewWidth);
+		
 		setNewWidth = screenWidth * 0.5;
 		setNewHeight = screenHeight * 0.4;
 		human.setMinimumHeight((int)setNewHeight);
@@ -234,6 +272,8 @@ public class MainActivity extends Activity {
 		//logo.setAdjustViewBounds(true);
 		playBtn.setAdjustViewBounds(true);
 		quitBtn.setAdjustViewBounds(true);
+		startBtn.setAdjustViewBounds(true);
+		rePlayBtn.setAdjustViewBounds(true);
 		
 		titan1.setAdjustViewBounds(true);
 		titan2.setAdjustViewBounds(true);
@@ -242,6 +282,8 @@ public class MainActivity extends Activity {
 		//logo.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		playBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		quitBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
+		startBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
+		rePlayBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		
 		human.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		
@@ -354,6 +396,7 @@ public class MainActivity extends Activity {
 	}
 	
 	public void enemyMovingTimer(){
+		t = new Timer();
 		t.scheduleAtFixedRate(new TimerTask() {
 
 		    @Override
@@ -451,7 +494,7 @@ public class MainActivity extends Activity {
 	
 	public void hitTest(int titanLoc){
 		if(titanLoc == humanPosition){
-			
+			gameOver();
 		}else{
 			buttonClicks();
 			totalHits++;
@@ -462,15 +505,37 @@ public class MainActivity extends Activity {
 	public void gameOver(){
 		t.cancel();
 		
+		resultTxt.setText(gameScore.getText());
+		
+		gameStage_human.setVisibility(View.INVISIBLE);
+		gameStage1.setVisibility(View.INVISIBLE);
+		gameOver.setVisibility(View.VISIBLE);
+		
+	}
+	
+	public void rePlayBtn(View v) {
+		buttonClicks();
+
+		gameOver.setVisibility(View.INVISIBLE);
+		gameMenu.setVisibility(View.VISIBLE);
+		
+		playBGMusic("music_1.mp3");
 	}
 	
 	public void playBtn(View v) {
 		buttonClicks();
 		
 		gameMenu.setVisibility(View.INVISIBLE);
+		gameIntro.setVisibility(View.VISIBLE);
+	}
+	
+	public void startBtn(View v) {
+		buttonClicks();
+		
+		gameIntro.setVisibility(View.INVISIBLE);
 		gameStage_human.setVisibility(View.VISIBLE);
 		gameStage1.setVisibility(View.VISIBLE);
-
+		
 		enemyMovingTimer();
 		
 		playBGMusic("music_1.mp3");
