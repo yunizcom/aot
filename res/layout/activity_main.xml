@@ -110,17 +110,40 @@
             android:id="@+id/rePlayBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
+            android:layout_below="@+id/submitBtn"
             android:onClick="rePlayBtn"
             android:src="@drawable/ic_launcher" />
+        
+        <ImageView
+            android:id="@+id/submitBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:onClick="submitBtn"
+            android:src="@drawable/ic_launcher" />
+        
+        <EditText
+            android:id="@+id/mynickName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+        	android:layout_above="@+id/submitBtn"
+            android:ems="5"
+            android:hint="type your nickname"
+            android:textColor="#fff"
+            android:textColorHint="#ccc"
+            android:background="#333333"
+            android:gravity="center"
+            android:textSize="20dp" />
         
         <TextView
         android:id="@+id/resultTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/rePlayBtn"
+        android:layout_above="@+id/mynickName"
         android:text=""
         android:textStyle="bold"
         android:gravity="center"

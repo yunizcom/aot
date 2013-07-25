@@ -1,24 +1,46 @@
 package com.yuniz.attackontitan;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.yuniz.attackontitan.R;
 
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -29,16 +51,18 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
 	public int screenWidth = 0;
 	public int screenHeight = 0;
-	
+
 	public int scaleSize1 = 1;
 	public int scaleSize2 = 1;
 	public int scaleSize3 = 1;
@@ -68,6 +92,7 @@ public class MainActivity extends Activity {
 	private ImageView quitBtn;
 	private ImageView startBtn;
 	private ImageView rePlayBtn;
+	private ImageView submitBtn;
 	
 	private ImageView human;
 	
@@ -77,6 +102,8 @@ public class MainActivity extends Activity {
 	
 	private TextView gameScore;
 	private TextView resultTxt;
+	
+	private EditText mynickName;
 	
 	MediaPlayer bgMusic;
 	MediaPlayer clickEffect;
@@ -131,6 +158,7 @@ public class MainActivity extends Activity {
 		quitBtn = (ImageView) findViewById(R.id.quitBtn);
 		startBtn = (ImageView) findViewById(R.id.startBtn);
 		rePlayBtn = (ImageView) findViewById(R.id.rePlayBtn);
+		submitBtn = (ImageView) findViewById(R.id.submitBtn);
 		
 		human = (ImageView) findViewById(R.id.human);
 		
@@ -140,6 +168,7 @@ public class MainActivity extends Activity {
 		
 		gameScore = (TextView) findViewById(R.id.gameScore);
 		resultTxt = (TextView) findViewById(R.id.resultTxt);
+		mynickName = (EditText) findViewById(R.id.mynickName);
 		
 		bgMusic  = new MediaPlayer();
 		clickEffect  = new MediaPlayer();
@@ -189,6 +218,10 @@ public class MainActivity extends Activity {
 		    ims1 = getAssets().open("replayBtn.png");
 		    d1 = Drawable.createFromStream(ims1, null);
 		    rePlayBtn.setImageDrawable(d1);
+		    
+		    ims1 = getAssets().open("submitBtn.png");
+		    d1 = Drawable.createFromStream(ims1, null);
+		    submitBtn.setImageDrawable(d1);
 		    
 		    ims1 = getAssets().open("g" + generateNumber(1,4) + "_" + generateNumber(1,2) + ".png");
 		    d1 = Drawable.createFromStream(ims1, null);
@@ -245,6 +278,15 @@ public class MainActivity extends Activity {
 		rePlayBtn.setMinimumWidth((int)setNewWidth);
 		rePlayBtn.setMaxWidth((int)setNewWidth);
 		
+		submitBtn.setMinimumHeight((int)setNewHeight);
+		submitBtn.setMaxHeight((int)setNewHeight);
+		submitBtn.setMinimumWidth((int)setNewWidth);
+		submitBtn.setMaxWidth((int)setNewWidth);
+		
+		setNewWidth = screenWidth * 0.7;
+		mynickName.setMinimumWidth((int)setNewWidth);
+		mynickName.setMaxWidth((int)setNewWidth);
+		
 		setNewWidth = screenWidth * 0.5;
 		setNewHeight = screenHeight * 0.4;
 		human.setMinimumHeight((int)setNewHeight);
@@ -274,6 +316,7 @@ public class MainActivity extends Activity {
 		quitBtn.setAdjustViewBounds(true);
 		startBtn.setAdjustViewBounds(true);
 		rePlayBtn.setAdjustViewBounds(true);
+		submitBtn.setAdjustViewBounds(true);
 		
 		titan1.setAdjustViewBounds(true);
 		titan2.setAdjustViewBounds(true);
@@ -284,6 +327,7 @@ public class MainActivity extends Activity {
 		quitBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		startBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		rePlayBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
+		submitBtn.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		
 		human.setScaleType( ImageView.ScaleType.FIT_CENTER);
 		
@@ -510,7 +554,6 @@ public class MainActivity extends Activity {
 		gameStage_human.setVisibility(View.INVISIBLE);
 		gameStage1.setVisibility(View.INVISIBLE);
 		gameOver.setVisibility(View.VISIBLE);
-		
 	}
 	
 	public void rePlayBtn(View v) {
@@ -522,8 +565,105 @@ public class MainActivity extends Activity {
 		playBGMusic("music_1.mp3");
 	}
 	
+	public void submitBtn(View v) {
+		buttonClicks();
+		
+		if(!isNetworkAvailable()){
+			Toast.makeText(getApplicationContext(), "You need internet connection to submit game score." , Toast.LENGTH_LONG).show();
+		}else{
+			if(mynickName.getText().toString() == ""){
+				Toast.makeText(getApplicationContext(), "Please type your nickname." , Toast.LENGTH_LONG).show();
+			}else{
+				gameScoreSubmitAPI(mynickName.getText().toString(), totalHits);
+			}
+		}
+	}
+	
+	public void gameScoreSubmitAPI(String nickname, int scores){
+		try {
+			nickname = URLEncoder.encode(nickname, "utf-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String url = "http://www.yuniz.com/apps/aot/?mod=1&nickname=" + nickname + "&score=" + scores;
+		//-------load JSON
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+        //nameValuePairs.add(new BasicNameValuePair("convo_id", "4546db1fd1"));
+        //nameValuePairs.add(new BasicNameValuePair("say", words));
+  
+		JSONObject json = getJSONfromURL(url, nameValuePairs);
+		try {
+			JSONArray  jsoncontacts = json.getJSONArray("reply");
+			
+			for(int i=0;i < jsoncontacts.length();i++){		
+				JSONArray e = jsoncontacts.getJSONArray(i);
+				
+				gameOver.setVisibility(View.INVISIBLE);
+				gameMenu.setVisibility(View.VISIBLE);
+				
+				playBGMusic("music_1.mp3");
+				
+				Log.v("DEBUG",e.getJSONArray(0) + "|" + e.getJSONArray(1) + "|" + e.getJSONArray(2));
+			}
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//-------load JSON
+	}
+	
+	public static JSONObject getJSONfromURL(String url,List<NameValuePair> postDatas ){
+
+		//initialize
+		InputStream is = null;
+		String result = "";
+		JSONObject jArray = null;
+
+		//http post
+		try{
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpPost httppost = new HttpPost(url);
+			
+	        httppost.setEntity(new UrlEncodedFormEntity(postDatas));
+			
+			HttpResponse response = httpclient.execute(httppost);
+			HttpEntity entity = response.getEntity();
+			is = entity.getContent();
+
+		}catch(Exception e){
+			Log.e("log_tag", "Error in http connection "+e.toString());
+		}
+
+		//convert response to string
+		try{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+			StringBuilder sb = new StringBuilder();
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+			is.close();
+			result=sb.toString();
+		}catch(Exception e){
+			Log.e("log_tag", "Error converting result "+e.toString());
+		}
+
+		//try parse the string to a JSON object
+		try{
+	        	jArray = new JSONObject(result);
+		}catch(JSONException e){
+			Log.e("log_tag", "Error parsing data "+e.toString());
+		}
+
+		return jArray;
+	} 
+	
 	public void playBtn(View v) {
 		buttonClicks();
+		
+		totalHits = 0;
 		
 		gameMenu.setVisibility(View.INVISIBLE);
 		gameIntro.setVisibility(View.VISIBLE);
@@ -643,6 +783,13 @@ public class MainActivity extends Activity {
 		
 		bgMusic.setLooping(true);
 		bgMusic.start();
+	}
+	
+	private boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 	
 	public void openURL(View v) {
