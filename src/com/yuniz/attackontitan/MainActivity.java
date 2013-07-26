@@ -504,7 +504,7 @@ public class MainActivity extends Activity {
 	}
 	
 	public void boardRefresh(){
-		txtNo1.setText("");
+		/*txtNo1.setText("");
 		txtNick1.setText("");
 		txtScore1.setText("");
 		txtNo2.setText("");
@@ -533,12 +533,12 @@ public class MainActivity extends Activity {
 		txtScore9.setText("");
 		txtNo10.setText("");
 		txtNick10.setText("");
-		txtScore10.setText("");
+		txtScore10.setText("");*/
 	}
 	
 	public void loadBoard(JSONArray jsoncontacts){
 		if(jsoncontacts.length() == 0 && Integer.parseInt(curPage) > 1){
-			//backToLastBoard();
+			backToLastBoard();
 			Toast.makeText(getApplicationContext(), "This is the last page of Hall Of Fame." , Toast.LENGTH_LONG).show();
 		}else{
 			boardRefresh();
@@ -849,7 +849,7 @@ public class MainActivity extends Activity {
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
         //nameValuePairs.add(new BasicNameValuePair("convo_id", "4546db1fd1"));
         //nameValuePairs.add(new BasicNameValuePair("say", words));
-  
+
 		JSONObject json = getJSONfromURL(url, nameValuePairs);
 		try {
 			curPosistion = json.getString("curPosistion");
@@ -874,10 +874,9 @@ public class MainActivity extends Activity {
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
         //nameValuePairs.add(new BasicNameValuePair("convo_id", "4546db1fd1"));
         //nameValuePairs.add(new BasicNameValuePair("say", words));
-  
+		
 		JSONObject json = getJSONfromURL(url, nameValuePairs);
 		try {
-			
 			loadBoard(json.getJSONArray("hallOfFame"));
 			
 		} catch (JSONException e) {
@@ -949,21 +948,19 @@ public class MainActivity extends Activity {
 		if(!isNetworkAvailable()){
 			Toast.makeText(getApplicationContext(), "You need internet connection to open Hall Of Fame." , Toast.LENGTH_LONG).show();
 		}else{
-		
 			totalHits = 0;
 			gameScore.setText("SCORE : 0 Titans");
 			
-			gameScoresAPI(curPage);
-			
 			gameMenu.setVisibility(View.INVISIBLE);
 			hallOfFameBoard.setVisibility(View.VISIBLE);
-		
+			
+			gameScoresAPI(curPage);
 		}
 	}
 	
 	public void boardNextBtn(View v) {
 		buttonClicks();
-		
+
 		int nextPage = Integer.parseInt(curPage) + 1;
 		
 		curPage = Integer.toString(nextPage);
@@ -980,7 +977,7 @@ public class MainActivity extends Activity {
 		
 		curPage = Integer.toString(nextPage);
 		
-		gameScoresAPI(curPage);
+		//gameScoresAPI(curPage);
 	}
 	
 	public void boardPrevBtn(View v) {
@@ -989,7 +986,7 @@ public class MainActivity extends Activity {
 		if(curPage == "1"){
 			Toast.makeText(getApplicationContext(), "These are the TOP 10 players." , Toast.LENGTH_LONG).show();
 		}else{
-		
+
 			int nextPage = Integer.parseInt(curPage) - 1;
 			
 			if(nextPage<1){

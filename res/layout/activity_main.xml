@@ -620,5 +620,5 @@
             android:src="@drawable/ic_launcher" />
 
     </RelativeLayout>
-
+    
 </RelativeLayout>
