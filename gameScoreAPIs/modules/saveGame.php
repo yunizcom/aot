@@ -46,9 +46,26 @@ if($nickname != "" && $score != ""){
 	$curPage = floor( $curPosistion / 10 ) + 1;
 	//--------get the current position----------
 	
-	$reply = '[['.$curPosistion.'],['.$curPage.'],['.$breakRecords.']]';
+	//--------load hall of fame----------
+	$hallOfFame = "";
+	$page = $curPage;
+	$page--;
+	$page = $page * 10;
+	$counter = $page + 1;
+	$results= mysql_query("SELECT nickname,scores from t_scores GROUP BY nickname ORDER BY scores desc,tdate desc LIMIT ".$page.",10");
+	if(mysql_Numrows($results)>0){
+		while ($row = mysql_fetch_array($results)) {
+			$hallOfFame.= '{"no":"'.$counter.'","n":"'.$row['nickname'].'","s":"'.$row['scores'].'"},';
+			$counter++;
+		}
+		$hallOfFame.= '{"no":"","n":"","s":""}';
+	}
+	//--------load hall of fame----------
 }
 ?>
 {
-    "reply": <?=$reply?>
+    "curPosistion": <?=$curPosistion?>,
+	"curPage": <?=$curPage?>,
+	"breakRecords": <?=$breakRecords?>,
+	"hallOfFame": [<?=$hallOfFame?>]
 }
