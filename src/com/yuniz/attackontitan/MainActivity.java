@@ -852,14 +852,18 @@ public class MainActivity extends Activity {
 
 		JSONObject json = getJSONfromURL(url, nameValuePairs);
 		try {
-			curPosistion = json.getString("curPosistion");
-			curPage = json.getString("curPage");
-			breakRecords = json.getString("breakRecords");
-			
-			loadBoard(json.getJSONArray("hallOfFame"));
-			
-			gameOver.setVisibility(View.INVISIBLE);
-			hallOfFameBoard.setVisibility(View.VISIBLE);
+			if(json == null){
+				Toast.makeText(getApplicationContext(), "You need internet connection to continue." , Toast.LENGTH_LONG).show();
+			}else{
+				curPosistion = json.getString("curPosistion");
+				curPage = json.getString("curPage");
+				breakRecords = json.getString("breakRecords");
+				
+				loadBoard(json.getJSONArray("hallOfFame"));
+				
+				gameOver.setVisibility(View.INVISIBLE);
+				hallOfFameBoard.setVisibility(View.VISIBLE);
+			}
 			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -877,8 +881,11 @@ public class MainActivity extends Activity {
 		
 		JSONObject json = getJSONfromURL(url, nameValuePairs);
 		try {
-			loadBoard(json.getJSONArray("hallOfFame"));
-			
+			if(json == null){
+				Toast.makeText(getApplicationContext(), "You need internet connection to continue." , Toast.LENGTH_LONG).show();
+			}else{
+				loadBoard(json.getJSONArray("hallOfFame"));
+			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
