@@ -24,7 +24,8 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f08003a;
+        public static final int action_settings=0x7f08003b;
+        public static final int adView=0x7f08003a;
         public static final int boardNextBtn=0x7f080032;
         public static final int boardPrevBtn=0x7f080033;
         public static final int button3=0x7f080036;
