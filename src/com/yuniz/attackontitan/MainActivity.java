@@ -47,6 +47,7 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.OrientationEventListener;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -58,6 +59,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.view.View;
+import com.revmob.RevMob;
+import com.revmob.RevMobTestingMode;
+import com.revmob.ads.banner.RevMobBanner;
 
 public class MainActivity extends Activity {
 	
@@ -153,6 +161,8 @@ public class MainActivity extends Activity {
 	MediaPlayer clickEffect;
 	
 	Timer t = new Timer();
+	
+	private RevMob revmob;
 	
 	private OrientationEventListener myOrientationEventListener;
 	
@@ -495,6 +505,16 @@ public class MainActivity extends Activity {
 		initTitans(titan3,titanLocNow3);
 	    
 	    playBGMusic("music_1.mp3");
+	    
+	    /*----RevMob Ads----*/
+		revmob = RevMob.start(this);
+//revmob.setTestingMode(RevMobTestingMode.WITH_ADS);
+		revmob.showFullscreen(this);
+		
+		RevMobBanner banner = revmob.createBanner(this);
+        ViewGroup view = (ViewGroup) findViewById(R.id.adbanner);
+        view.addView(banner);
+        /*----RevMob Ads----*/
 	}
 	
 	public int generateNumber(int startFrom, int stopAt){
@@ -947,6 +967,8 @@ public class MainActivity extends Activity {
 		
 		gameMenu.setVisibility(View.INVISIBLE);
 		gameIntro.setVisibility(View.VISIBLE);
+		
+		revmob.showFullscreen(this);
 	}
 	
 	public void openHallOfFameBtn(View v) {
@@ -963,6 +985,8 @@ public class MainActivity extends Activity {
 			
 			gameScoresAPI(curPage);
 		}
+		
+		revmob.showFullscreen(this);
 	}
 	
 	public void boardNextBtn(View v) {
