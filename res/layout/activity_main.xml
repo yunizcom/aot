@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads= "http://schemas.android.com/apk/lib/com.google.ads"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -45,12 +46,23 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="56dp"
             android:layout_marginRight="10dp"
             android:text="SCORE : 0 Titans"
             android:textColor="#e10f0f"
             android:textStyle="bold"
             android:textSize="20dp" />
+        
+        <com.google.ads.AdView 
+	        android:id="@+id/adView" 
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true" 
+	        android:layout_alignParentTop="true" 
+	        ads:adSize="SMART_BANNER" 
+	        ads:adUnitId="a152662bfdcdef6" 
+	        ads:loadAdOnCreate="true" > 
+	    </com.google.ads.AdView> 
 
     </RelativeLayout>    
     
